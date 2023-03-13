@@ -30,14 +30,13 @@
     </h1>
 
 @foreach($posts as $p)
-@php($p = explode(",", $p))
 
 <div class="card mb-3">
   <div class="card-body">
-    <p class="card-text">{{ $p[1] }}</p>
-    <p class="card-text">{{ $p[2] }}</p>
-    <p class="card-text"><small class="text-muted">Created at {{ date("d M Y H:i"), strtotime($p[3])}}</small></p>
-    <a href="{{ url("posts/$p[0]") }}" class="btn btn-primary">Selengkapnya</a>
+    <p class="card-text">{{ $p->title }}</p>
+    <p class="card-text">{{ $p->content }}</p>
+    <p class="card-text"><small class="text-muted">Created at {{ date("d M Y H:i"), strtotime($p->created_at)}}</small></p>
+    <a href="{{ url("posts/$p->id") }}" class="btn btn-primary">Selengkapnya</a>
   </div>
 </div>
 @endforeach

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
@@ -14,13 +15,15 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Storage::get('posts.txt');
-        $posts = explode("\n", $posts);
-
-        $data = [
-            'posts' => $posts
+            // "SELECT title, content FROM posts"
+        $posts = DB::table('posts')
+                    // ->select('id', 'title', 'content', 'created_at')
+                    ->get();
+        // dd($posts);
+        $view_data = [
+            'posts' => $posts,
         ];
-        return view('posts.index', $data);
+        return view('posts.index', $view_data);
     }
 
     /**
@@ -43,7 +46,35 @@ class PostController extends Controller
     {
         $title = $request->input('title');
         $content = $request->input('content');
-        dd($title, $content);
+
+        // $posts = Storage::get('posts.txt');
+
+        // $posts = explode("\n", $posts);
+
+        // $new_post = [
+        //     count($posts) + 1,
+        //     $title,
+        //     $content,
+        //     date("Y-m-d H:i;s")
+        // ];
+
+        // $new_post = implode(",", $new_post);
+
+        // array_push($posts, $new_post);
+
+        // $posts = implode("\n", $posts);
+
+        // Storage::put('posts.txt', $posts);
+
+        DB::table('posts')->insert([
+            'title' => $title,
+            'content' => $content,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        return redirect('posts');
+
     }
 
     /**
@@ -54,15 +85,21 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        $posts = Storage::get('posts.txt');
-        $posts = explode("\n", $posts);
-        $selected_post = array();
-        foreach($posts as $p) {
-            $p = explode(",", $p);
-            if ($p[0] == $id) {
-                $selected_post = $p;
-            }
-        }
+        // $posts = Storage::get('posts.txt');
+        // $posts = explode("\n", $posts);
+        // $selected_post = array();
+        // foreach($posts as $p) {
+        //     $p = explode(",", $p);
+        //     if ($p[0] == $id) {
+        //         $selected_post = $p;
+        //     }
+        // }\\
+
+        $selected_post = DB::table('posts')
+            // ->select('id', 'title', 'content', 'created_at')
+            ->where('id', $id)
+            ->first();
+
         $data = [
             'post' => $selected_post
         ];
