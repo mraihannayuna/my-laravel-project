@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{{ $post->title }}</title>
+    <title>{{ $posts->title }}</title>
 
         {{-- Bootstrap CSS --}}
     <link href="{{ asset('bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
@@ -17,10 +17,10 @@
 
     <div class="container">
         <article class="blog-post mt-5">
-        <h2 class="blog-post-title mb-1">{{ $post->title }}</h2>
-        <p class="blog-post-meta">{{ date("d M Y H:i"), strtotime($post->created_at)}}</p>
+        <h2 class="blog-post-title mb-1">{{ $posts->title }}</h2>
+        <p class="blog-post-meta">{{ date("d M Y H:i"), strtotime($posts->created_at)}}</p>
 
-        <p>{{ $post->content }}</p>
+        <p>{{ $posts->content }}</p>
         </article>
 
         <a href="{{ url("posts") }}" class="btn btn-success">Kembali</a>

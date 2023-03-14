@@ -100,10 +100,10 @@ class PostController extends Controller
             ->where('id', $id)
             ->first();
 
-        $data = [
-            'post' => $selected_post
+        $view_data = [
+            'posts' => $selected_post
         ];
-        return view('posts.show', $data);
+        return view('posts.show', $view_data);
     }
 
     /**
@@ -114,7 +114,14 @@ class PostController extends Controller
      */
     public function edit($id)
     {
-        echo "ini adalah halaman edit data dari id = $id";
+        $posts = DB::table('posts')
+                    ->select('id','title','content','created_at')
+                    ->where('id', $id)
+                    ->first();
+        $view_data = [
+            'posts' => $posts,
+        ];
+        return view('posts.edit', $view_data);
     }
 
     /**
@@ -126,7 +133,19 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // ? isinya proses ( logic )
+        $title = $request->input('title');
+        $content = $request->input('content');
+
+        // "UPDATE ...   WHERE id = $id"
+        DB::table('posts')
+            ->where('id', $id)
+            ->update([
+                'title' => $title,
+                'content' => $content,
+                'updated_at' => date('Y-m-d H:i:s'),
+            ]);
+
+        return redirect("posts/{$id}");
     }
 
     /**
@@ -137,6 +156,6 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        // ? isinya proses ( logic )
+
     }
 }
