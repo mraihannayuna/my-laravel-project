@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -10,20 +11,24 @@ class PostController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
+     *3
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
             // "SELECT title, content FROM posts"
-        $posts = DB::table('posts')
-                    // ->select('id', 'title', 'content', 'created_at')
-                    ->get();
+        // $posts = Post::where('active', true)->get();
+                $posts = Post::active()
+                                // ->withTrashed()
+                                ->get();
+
+                     // ->select('id', 'title', 'content', 'created_at')
+
         // dd($posts);
-        $view_data = [
+        $data = [
             'posts' => $posts,
         ];
-        return view('posts.index', $view_data);
+        return view('posts.index', $data);
     }
 
     /**
@@ -66,7 +71,7 @@ class PostController extends Controller
 
         // Storage::put('posts.txt', $posts);
 
-        DB::table('posts')->insert([
+        Post::insert([
             'title' => $title,
             'content' => $content,
             'created_at' => date('Y-m-d H:i:s'),
@@ -95,10 +100,15 @@ class PostController extends Controller
         //     }
         // }\\
 
-        $selected_post = DB::table('posts')
+            // ? SELECT * FROM posts WHERE id = $id
+        // $selected_post = Post::selectedById($id)->first();
+         $selected_post = Post::selectedById($id)->first();
+                // $selected_post = Post::findOrfail($id)->first();
+
+        // $selected_post = DB::table('posts')
             // ->select('id', 'title', 'content', 'created_at')
-            ->where('id', $id)
-            ->first();
+            // ->where('id', $id)
+            // ->first();
 
         $view_data = [
             'posts' => $selected_post
@@ -114,10 +124,10 @@ class PostController extends Controller
      */
     public function edit($id)
     {
-        $posts = DB::table('posts')
-                    ->select('id','title','content','created_at')
-                    ->where('id', $id)
-                    ->first();
+        $posts = Post::selectedById($id)->first();
+                    // ->select('id','title','content','created_at')
+                    // ->where('id', $id)
+                    // ->first();
         $view_data = [
             'posts' => $posts,
         ];
@@ -137,8 +147,7 @@ class PostController extends Controller
         $content = $request->input('content');
 
         // "UPDATE ...   WHERE id = $id"
-        DB::table('posts')
-            ->where('id', $id)
+        Post::selectedById($id)
             ->update([
                 'title' => $title,
                 'content' => $content,
@@ -156,11 +165,25 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        DB::table('posts')
-            ->where('id', $id)
-            ->delete();
+                Post::selectedById($id)->delete();
+        // Post::where('id', $id)
+        //     ->where('id', $id)
+        //     ->delete();
 
         return redirect('posts');
 
     }
+
+    public function trash() {
+
+        $trash_item = Post::onlyTrashed()->get();
+
+        $data = [
+            'posts' => $trash_item,
+        ];
+
+        return view('posts.recylebin', $data);
+
+    }
+
 }

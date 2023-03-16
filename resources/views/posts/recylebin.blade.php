@@ -26,8 +26,7 @@
 <div class="container mt-5">
     <h1>
         Blog Saya
-        <a class="btn btn-success" href="{{ url('posts/create') }}">+ Buat Postingan</a>
-        <a class="btn btn-danger" href="{{ url('posts/trash') }}">Riwayat delet</a>
+                <a class="btn btn-primary" href="{{ url('posts') }}">Kembali</a>
     </h1>
 
 @foreach($posts as $p)
@@ -37,8 +36,6 @@
     <p class="card-text">{{ $p->title }}</p>
     <p class="card-text">{{ $p->content }}</p>
     <p class="card-text"><small class="text-muted">Created at {{ date("d M Y H:i"), strtotime($p->created_at)}}</small></p>
-    <a href="{{ url("posts/$p->id") }}" class="btn btn-primary">Selengkapnya</a>
-    <a href="{{ url("posts/$p->id/edit") }}" class="btn btn-warning">edit</a>
   </div>
 </div>
 @endforeach
