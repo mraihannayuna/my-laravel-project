@@ -1,15 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Blog | Buat Postingan</title>
-
-            {{-- Bootstrap CSS --}}
-    <link href="{{ asset('bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-</head>
-<body>
+@extends('layouts.app')
+@section('title', "OhayoBlog | NewBlog")
+@section('content')
     <form method="post" action="{{ url('posts') }}">
         @csrf
     <div class="container mt-5">
@@ -33,3 +24,4 @@
 
 </body>
 </html>
+@endsection

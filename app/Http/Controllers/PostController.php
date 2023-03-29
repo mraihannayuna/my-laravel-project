@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
@@ -11,22 +12,38 @@ class PostController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *3
+     *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
             // "SELECT title, content FROM posts"
-        // $posts = Post::where('active', true)->get();
-                $posts = Post::active()
-                                // ->withTrashed()
-                                ->get();
-
+        // $posts = Post::where('active', true)->
+                // $posts = Post::active()
+                //                  ->withTrashed()
+                //                 ->get();
                      // ->select('id', 'title', 'content', 'created_at')
 
         // dd($posts);
+
+        // $posts = Post::active()->get();
+        // $total_active = $posts->count();
+        // $total_nonActive = Post::nonActive()->count();
+
+        if(!Auth::check()){
+            return redirect('logout');
+        }
+
+        $posts = Post::Status(true)->get();
+        $total_active = $posts->count();
+        $total_nonActive = Post::Status(false)->count();
+        $total_deleted = Post::onlyTrashed()->count();
+
         $data = [
             'posts' => $posts,
+            'total_active' => $total_active,
+            'total_nonactive' => $total_nonActive,
+            'total_deleted' => $total_deleted,
         ];
         return view('posts.index', $data);
     }
@@ -38,6 +55,11 @@ class PostController extends Controller
      */
     public function create()
     {
+
+                if(!Auth::check()){
+            return redirect('logout');
+        }
+
         return view('posts.create');
     }
 
@@ -49,6 +71,11 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+
+                if(!Auth::check()){
+            return redirect('logout');
+        }
+
         $title = $request->input('title');
         $content = $request->input('content');
 
@@ -71,11 +98,11 @@ class PostController extends Controller
 
         // Storage::put('posts.txt', $posts);
 
-        Post::insert([
+        Post::create([
             'title' => $title,
             'content' => $content,
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s'),
+            // 'created_at' => date('Y-m-d H:i:s'),
+            // 'updated_at' => date('Y-m-d H:i:s'),
         ]);
 
         return redirect('posts');
@@ -88,8 +115,13 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($slug)
     {
+
+                if(!Auth::check()){
+            return redirect('logout');
+        }
+
         // $posts = Storage::get('posts.txt');
         // $posts = explode("\n", $posts);
         // $selected_post = array();
@@ -102,7 +134,9 @@ class PostController extends Controller
 
             // ? SELECT * FROM posts WHERE id = $id
         // $selected_post = Post::selectedById($id)->first();
-         $selected_post = Post::selectedById($id)->first();
+        $selected_post = Post::where('slug', $slug)->first();
+        $comments = $selected_post->comments()->get();
+        $total_comments = $selected_post->comments()->count();
                 // $selected_post = Post::findOrfail($id)->first();
 
         // $selected_post = DB::table('posts')
@@ -111,7 +145,9 @@ class PostController extends Controller
             // ->first();
 
         $view_data = [
-            'posts' => $selected_post
+            'posts' => $selected_post,
+            'comments' => $comments,
+            'total_comments' => $total_comments
         ];
         return view('posts.show', $view_data);
     }
@@ -122,9 +158,14 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($slug)
     {
-        $posts = Post::selectedById($id)->first();
+
+                if(!Auth::check()){
+            return redirect('logout');
+        }
+
+        $posts = Post::where('slug',$slug)->first();
                     // ->select('id','title','content','created_at')
                     // ->where('id', $id)
                     // ->first();
@@ -141,20 +182,25 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $slug)
     {
+
+                if(!Auth::check()){
+            return redirect('logout');
+        }
+
         $title = $request->input('title');
         $content = $request->input('content');
 
         // "UPDATE ...   WHERE id = $id"
-        Post::selectedById($id)
+        Post::where('slug',$slug)
             ->update([
                 'title' => $title,
                 'content' => $content,
                 'updated_at' => date('Y-m-d H:i:s'),
             ]);
 
-        return redirect("posts/{$id}");
+        return redirect("posts/$slug");
     }
 
     /**
@@ -165,6 +211,11 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
+
+                if(!Auth::check()){
+            return redirect('logout');
+        }
+
                 Post::selectedById($id)->delete();
         // Post::where('id', $id)
         //     ->where('id', $id)
@@ -176,7 +227,12 @@ class PostController extends Controller
 
     public function trash() {
 
+                if(!Auth::check()){
+            return redirect('logout');
+        }
+
         $trash_item = Post::onlyTrashed()->get();
+
 
         $data = [
             'posts' => $trash_item,

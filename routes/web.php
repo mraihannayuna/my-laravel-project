@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\http\Controllers\AuthController;
 use App\Http\Controllers\HelloController;
 use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
@@ -42,14 +43,29 @@ Route::get('/', function () {
 // Route::get('menu', [AdminController::class, 'index']);
 
 
+Route::get('login', [AuthController::class, 'login']);
+Route::post('login', [AuthController::class, 'authenticate']);
+Route::get('logout', [AuthController::class, 'logout']);
+Route::get('register', [AuthController::class, 'register_form']);
+Route::post('register', [AuthController::class, 'register_form']);
 
 Route::get('posts', [PostController::class, 'index']);
+
+Route::get('posts/{id}/create', [PostController::class, 'create']);
+
 Route::get('posts/create', [PostController::class, 'create']);
+
+
 Route::get('posts/trash', [PostController::class, 'trash']);
-Route::get('posts/{id}', [PostController::class, 'show']);
+
+Route::get('posts/{slug}', [PostController::class, 'show']);
+
 Route::post('posts', [PostController::class, 'store']);
+
 Route::get('posts/{id}/edit', [PostController::class, 'edit']);
-Route::patch('posts/{id}', [PostController::class, 'update']);
+
+Route::patch('posts/{slug}', [PostController::class, 'update']);
+
 Route::delete('posts/{id}', [PostController::class, 'destroy']);
 
 
